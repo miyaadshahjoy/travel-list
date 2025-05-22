@@ -1,16 +1,15 @@
 import { useState } from "react";
 
-const initialItems = [
-  { id: 1, description: "Passports", quantity: 2, packed: true },
-  { id: 2, description: "Socks", quantity: 12, packed: false },
-];
-
 export default function App() {
+  const [items, setItems] = useState([]);
+  const handleAddItem = (item) => {
+    setItems((items) => [...items, item]);
+  };
   return (
     <div className="app">
       <Header />
-      <Form />
-      <PackageList />
+      <Form onAddItem={handleAddItem} />
+      <PackingList items={items} />
       <Stats />
     </div>
   );
@@ -23,18 +22,18 @@ function Header() {
     </header>
   );
 }
-function Form() {
+function Form({ onAddItem }) {
   const [quantity, setQuantity] = useState(1);
-  const [item, setItem] = useState("");
+  const [description, setDescription] = useState("");
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    if (!item) return;
-    console.log(quantity, item);
-
+    if (!description) return;
+    const newItem = { description, quantity, packed: false, id: Date.now() };
+    onAddItem(newItem);
     setQuantity(1);
-    setItem("");
+    setDescription("");
   };
 
   return (
@@ -49,8 +48,8 @@ function Form() {
         </select>
         <input
           type="text"
-          value={item}
-          onChange={(e) => setItem(e.target.value)}
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
           placeholder="Item..."
         ></input>
         <button type="submit">ADD</button>
@@ -59,11 +58,11 @@ function Form() {
   );
 }
 
-function PackageList() {
+function PackingList({ items }) {
   return (
     <div className="list">
       <ul>
-        {initialItems.map((item) => (
+        {items.map((item) => (
           <ListItem item={item} key={item.id} />
         ))}
       </ul>
